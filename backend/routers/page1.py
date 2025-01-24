@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from model import ModelHandler
 
 page1_bp = Blueprint('page1', __name__)
 
@@ -10,8 +11,11 @@ def page1_data():
     # TODO: Send a request to the database to retrieve user-related information
     #
 
-    # TODO: Submit the query to the LLM (Language Model) for processing
-    #
-
+    llm_model = ModelHandler()
     data = request.json
-    return jsonify({"received_data": data})
+    if not data or 'message' not in data:
+        return jsonify({"error": "The 'message' attribute is missing from the request data."}), 400
+    user_prompt = data['message']
+    response = llm_model.generate_response(user_prompt) 
+    
+    return jsonify({"response": response})

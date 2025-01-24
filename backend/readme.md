@@ -2,7 +2,10 @@ Running the server:
 $python main.py
 
 Sending requests to the server:
-curl -X POST http://localhost:3000/api/page1/data -H "Content-Type: application/json" -d "{\"key\": \"value\"}"
+$curl -X POST http://localhost:3000/api/page1/data -H "Content-Type: application/json" -d "{\"key\": \"value\"}"
+
+run first:
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
 TODO List
 Dockerize the backend to ensure seamless deployment and scalability.
