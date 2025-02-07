@@ -5,3 +5,11 @@ transformers
 accelerate
 bitsandbytes
 huggingface-hub
+torch 
+transformers 
+langchain 
+chromadb
+pypdf2 
+sentence-transformers
+tf-keras
+jwt
