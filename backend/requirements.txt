@@ -12,4 +12,7 @@ chromadb
 pypdf2 
 sentence-transformers
 tf-keras
-jwt
+pyjwt
+flask-pymongo
+dnspython
+bcrypt
