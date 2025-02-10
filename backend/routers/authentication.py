@@ -1,39 +1,40 @@
 from flask import Blueprint, request, jsonify
-from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
-from functools import wraps
+import bcrypt
+from database import db
 
-# TODO: Import the appropriate module for database operations
-# from your_database_module import get_user_by_email, create_user
-
-# Create Blueprint
 auth_bp = Blueprint('auth', __name__)
 
-# Secret key (should be retrieved from env file)
-SECRET_KEY = "your_secret_key"
+SECRET_KEY = "secret"
+users_collection = db["users"]
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
+    username = data.get('username')
     email = data.get('email')
     password = data.get('password')
     
-    if not email or not password:
-        return jsonify({'message': 'Email and password are required!'}), 400
-    
-    # TODO: Check if the user already exists in the database
-    # existing_user = get_user_by_email(email)
-    existing_user = None  # Temporarily set to None
+    if not username or not email or not password:
+        return jsonify({'message': 'Kullanıcı adı, e-posta ve şifre gereklidir!'}), 400
+
+    existing_user = users_collection.find_one({"email": email})
     if existing_user:
-        return jsonify({'message': 'User already exists!'}), 400
-    
-    hashed_password = generate_password_hash(password, method='sha256')
-    
-    # TODO: Insert new user into the database
-    # create_user(email, hashed_password)
-    
-    return jsonify({'message': 'User registered successfully!'}), 201
+        return jsonify({'message': 'Bu e-posta adresi ile kayıtlı bir kullanıcı zaten var!'}), 400
+
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+
+    user_data = {
+        "username": username,
+        "email": email,
+        "password": hashed_password.decode('utf-8'),
+        "salt": salt.decode('utf-8')
+    }
+    users_collection.insert_one(user_data)
+
+    return jsonify({'message': 'Kullanıcı başarıyla kaydedildi!'}), 201
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -42,14 +43,24 @@ def login():
     password = data.get('password')
     
     if not email or not password:
-        return jsonify({'message': 'Email and password are required!'}), 400
+        return jsonify({'message': 'E-posta ve şifre gereklidir!'}), 400
     
-    # TODO: Retrieve the user from the database
-    # user = get_user_by_email(email)
-    user = None  # Temporarily set to None
-    if not user or not check_password_hash("", password):  # Dummy data for password check
-        return jsonify({'message': 'Invalid credentials!'}), 401
-    
-    token = jwt.encode({'email': email, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)}, SECRET_KEY, algorithm="HS256")
-    
+    user = users_collection.find_one({"email": email})
+    if not user:
+        return jsonify({'message': 'Geçersiz e-posta veya şifre!'}), 401
+
+    stored_salt = user["salt"].encode('utf-8')
+    stored_hashed_password = user["password"].encode('utf-8')
+
+    hashed_input_password = bcrypt.hashpw(password.encode('utf-8'), stored_salt)
+
+    if hashed_input_password != stored_hashed_password:
+        return jsonify({'message': 'Geçersiz e-posta veya şifre!'}), 401
+
+    token = jwt.encode(
+        {'email': email, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)},
+        SECRET_KEY,
+        algorithm="HS256"
+    )
+
     return jsonify({'token': token}), 200
