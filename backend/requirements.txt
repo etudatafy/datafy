@@ -13,6 +13,7 @@ pypdf2
 sentence-transformers
 tf-keras
 pyjwt
+flask_jwt_extended
 flask-pymongo
 dnspython
 bcrypt

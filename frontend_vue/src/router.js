@@ -5,10 +5,10 @@ import LoginPage from './pages/LoginPage.vue';
 import ChatPage from './pages/ChatPage.vue';
 
 const routes = [
-  { path: '/home', component: HomePage },
-  { path: '/register', component: RegisterPage },
-  { path: '/login', component: LoginPage },
-  { path: '/chat', component: ChatPage }
+  { path: '/ana-sayfa', component: HomePage },
+  { path: '/kayit-ol', component: RegisterPage },
+  { path: '/giris-yap', component: LoginPage },
+  { path: '/yapay-zeka-yardim/:chatId?', component: ChatPage, props: true }
 ];
 
 const router = createRouter({

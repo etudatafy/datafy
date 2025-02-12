@@ -53,7 +53,7 @@ export default {
 
         alert('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...');
         console.log('Sunucu Yanıtı:', response.data);
-        this.$router.push('/login');
+        this.$router.push('/giris-yap');
       } catch (error) {
         const errorMessage =
           error.response?.data?.message || 'Kayıt sırasında hata oluştu.';
