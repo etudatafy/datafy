@@ -41,6 +41,7 @@ export default {
 
         alert('Giriş başarılı!');
         console.log('Sunucu Yanıtı:', response.data);
+        this.$router.push('/ana-sayfa');
       } catch (error) {
         const errorMessage =
           error.response?.data?.message || 'Giriş sırasında hata oluştu.';
