@@ -17,8 +17,8 @@
       </div>
     </div>
 
-    <div v-if="loading" class="align-self-start text-muted">
-      <i class="bi bi-three-dots animate-blink"></i> Yapay Zeka yazıyor...
+    <div v-if="loading" class="align-self-start text-muted loading-message animate-blink">
+      <i class="bi bi-three-dots"></i> Yapay Zeka sana özel cevap üretiyor
     </div>
   </div>
 </template>
@@ -40,14 +40,24 @@ export default {
     messages() {
       this.scrollToBottom();
     },
+    loading(newValue) {
+      if (newValue) {
+        this.scrollToBottom();
+      }
+    }
   },
   methods: {
     scrollToBottom() {
       this.$nextTick(() => {
         const container = this.$refs.messagesContainer;
-        container.scrollTop = container.scrollHeight;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
       });
     }
+  },
+  mounted() {
+    this.scrollToBottom();
   }
 };
 </script>
@@ -58,6 +68,8 @@ export default {
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  padding-bottom: 20px; /* Alt kısımda mesaj giriş çubuğu ile çakışmayı engeller */
+  margin-bottom: 20px; /* Alt boşluk ekleyerek mesaj giriş kutusunun mesajları kapatmasını önler */
 }
 
 .chat-messages::-webkit-scrollbar {
@@ -70,5 +82,22 @@ export default {
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
+}
+
+/* Yanıp sönme animasyonu */
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+.animate-blink {
+  animation: blink 1.5s infinite;
+}
+
+/* Yapay zeka yüklenme mesajı için stil */
+.loading-message {
+  font-style: italic;
+  font-size: 0.9rem;
 }
 </style>

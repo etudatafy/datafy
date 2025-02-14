@@ -58,7 +58,13 @@ class RAGModel:
             temperature=0.7,
             pad_token_id=self.tokenizer.eos_token_id,
         )
-        return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        
+        generated_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+        if "Answer:" in generated_text:
+            generated_text = generated_text.split("Answer:")[-1].strip()
+        
+        return generated_text
 
     def retrieve_relevant_chunks(self, query, top_k=3):
         """Retrieves the most relevant text chunks based on the given query."""
