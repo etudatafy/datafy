@@ -1,8 +1,8 @@
 <template>
   <AppLayout>
     <div class="chat-container d-flex flex-column w-100 h-100 mt-5 pt-4">
-      <div class="chat-messages flex-grow-1 overflow-auto p-3 d-flex flex-column align-items-center">
-        <ChatMessages :messages="messages" :loading="loading" />
+      <div ref="messagesContainer" class="chat-messages flex-grow-1 overflow-auto p-0 d-flex flex-column align-items-center">
+        <ChatMessages ref="chatMessages" :messages="messages" :loading="loading" />
       </div>
 
       <ChatInput v-model="userMessage" @send="sendMessage" :loading="loading" />
@@ -45,6 +45,7 @@ export default {
         const result = await response.json();
         if (response.ok && result.messages) {
           this.messages = result.messages;
+          this.scrollToBottom();
         }
       } catch (error) {
         console.error("Sohbet geçmişi alınırken hata oluştu:", error);
@@ -54,6 +55,8 @@ export default {
       if (!this.userMessage.trim()) return;
 
       this.messages.push({ text: this.userMessage, sender: "sender" });
+      this.$nextTick(() => this.scrollToBottom()); // Mesaj eklendiğinde en alta kaydır
+
       const sentMessage = this.userMessage;
       this.userMessage = "";
       this.loading = true;
@@ -83,6 +86,7 @@ export default {
           if (result.messages) {
             this.messages = result.messages;
           }
+          this.$nextTick(() => this.scrollToBottom()); // Yapay zekadan gelen mesajda da kaydır
         } else {
           console.error("Hata:", result.error || "Bilinmeyen hata");
         }
@@ -91,6 +95,14 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const container = this.$refs.messagesContainer;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      });
     },
   },
   beforeRouteUpdate(to, from, next) {
@@ -103,18 +115,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.chat-container {
-  margin-top: 60px; /* Header kadar boşluk bırak */
-  padding-top: 20px; /* İçerik header'a yapışmasın */
-  height: calc(100vh - 100px); /* Header ve input alanı için alan bırak */
-}
-
-.chat-messages {
-  flex-grow: 1;
-  overflow-y: auto;
-  width: 100%;
-  max-height: calc(100vh - 160px); /* Header ve chat input hesaba katıldı */
-}
-</style>
