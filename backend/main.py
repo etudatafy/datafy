@@ -1,15 +1,18 @@
 from flask import Flask
 from flask_cors import CORS
-from routers.authentication import auth_bp
 from flask_jwt_extended import JWTManager
+import config
+from database import db
+from websocket.chat_ws import socketio
+from routers.authentication import auth_bp
 from routers.chat import chat_bp
 from routers.page1 import page1_bp
 from routers.page2 import page2_bp
 from routers.page3 import page3_bp
 from routers.page4 import page4_bp
 from routers.page5 import page5_bp
-import config
 
+# Flask uygulaması oluştur
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": ["http://localhost:8080", "https://yourfrontenddomain.com"]}})
 
@@ -21,7 +24,7 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = config.JWT_ACCESS_TOKEN_EXPIRES
 # JWT Manager başlat
 jwt = JWTManager(app)
 
-# Register blueprints
+# Blueprintleri ekle
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(chat_bp, url_prefix='/api/chat')
 app.register_blueprint(page1_bp, url_prefix='/api/page1')
@@ -30,6 +33,7 @@ app.register_blueprint(page3_bp, url_prefix='/api/page3')
 app.register_blueprint(page4_bp, url_prefix='/api/page4')
 app.register_blueprint(page5_bp, url_prefix='/api/page5')
 
+socketio.init_app(app)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=3000)
+    socketio.run(app, debug=True, port=3000)
