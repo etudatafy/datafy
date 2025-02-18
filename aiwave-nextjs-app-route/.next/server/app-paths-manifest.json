@@ -1,0 +1,8 @@
+{
+  "/utilize/page": "app/utilize/page.js",
+  "/home/page": "app/home/page.js",
+  "/page": "app/page.js",
+  "/contact/page": "app/contact/page.js",
+  "/roadmap/page": "app/roadmap/page.js",
+  "/text-generator/page": "app/text-generator/page.js"
+}

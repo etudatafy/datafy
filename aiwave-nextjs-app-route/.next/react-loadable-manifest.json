@@ -1,0 +1,20 @@
+{
+  "components/Testimonials/Testimonial.js -> venobox/dist/venobox.min.js": {
+    "id": "components/Testimonials/Testimonial.js -> venobox/dist/venobox.min.js",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_venobox_dist_venobox_min_js.js"
+    ]
+  },
+  "components/Testimonials/TestimonialTwo.js -> venobox/dist/venobox.min.js": {
+    "id": "components/Testimonials/TestimonialTwo.js -> venobox/dist/venobox.min.js",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_venobox_dist_venobox_min_js.js"
+    ]
+  },
+  "components/VedioGenerator/VedioGenerator.js -> venobox/dist/venobox.min.js": {
+    "id": "components/VedioGenerator/VedioGenerator.js -> venobox/dist/venobox.min.js",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_venobox_dist_venobox_min_js.js"
+    ]
+  }
+}
