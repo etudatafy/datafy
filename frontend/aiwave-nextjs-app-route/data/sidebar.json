@@ -1,0 +1,24 @@
+{
+  "sidebar": [
+    {
+      "id": "getstarted",
+      "text": "Başlarken",
+      "isShow": true,
+      "list": [
+        {
+          "id": "text-generator-sec",
+          "text": "AI Chatbot ile Bağlantı Kur"
+        },
+        {
+          "id": "pernalized-sec",
+          "text": "Kişiselleştirilmiş Öneriler Al"
+        },
+        {
+          "id": "engage-sec",
+          "text": "Özellikleri Keşfet ve Kullan"
+        }
+      ]
+    }
+    
+  ]
+}
