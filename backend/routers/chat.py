@@ -4,7 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from bson.objectid import ObjectId
 import datetime
 import config  # Config dosyasını içe aktarıyoruz
-from model import rag_model  # RAGModel sınıfını içe aktarıyoruz
+#from model import rag_model  # RAGModel sınıfını içe aktarıyoruz
 
 chat_bp = Blueprint('chat', __name__)
 
@@ -58,7 +58,7 @@ def chat():
 
     if chat_type == 1:
         # LLM'den yanıt al
-        model_response = rag_model.generate_response(user_message)
+        model_response = "Hello World" #rag_model.generate_response(user_message)
 
         new_chat = {
             "_id": ObjectId(),
@@ -92,7 +92,7 @@ def chat():
             return jsonify({"error": "Sohbet bulunamadı"}), 404
 
         # LLM'den yanıt al
-        model_response = rag_model.generate_response(user_message)
+        model_response ="Hello World" # rag_model.generate_response(user_message)
 
         messages = add_message_to_chat(user_id, chat_id, model_response, "receiver")
 
