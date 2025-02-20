@@ -1,1 +1,12 @@
+# Ignore Python bytecode files
 *.pyc
+
+# Ignore node_modules directory
+node_modules/
+
+# Ignore __pycache__ directories
+__pycache__/
+
+# Ignore Next.js build and cache files
+.next/
+
