@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { loginUser } from "../api";
+import { useAuth } from "../context/AuthContext"; // AuthContext'ten login fonksiyonunu al
 
 import Image from "next/image";
 import Link from "next/link";
@@ -15,16 +17,22 @@ const SigninPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { login } = useAuth(); // Context'teki login fonksiyonunu al
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
+
     try {
       const data = await loginUser(email, password);
-      localStorage.setItem("token", data.token); // Token'ı sakla
-      alert("Giriş başarılı!");
-      window.location.href = "/home"; // Kullanıcıyı yönlendir
+      login(data.token); // Context API içindeki login fonksiyonunu çağır
     } catch (err) {
       setError(err.response?.data?.message || "Giriş yapılamadı.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -106,8 +114,12 @@ const SigninPage = () => {
                             <span>Forgot password</span>
                           </a>
                         </div>
-                        <button type="submit" className="btn-default">
-                          Sign In
+                        <button
+                          type="submit"
+                          className="btn-default"
+                          disabled={loading}
+                        >
+                          {loading ? "Signing in..." : "Sign In"}
                         </button>
                       </form>
                     </div>
@@ -137,27 +149,17 @@ const SigninPage = () => {
                         </a>
                       </div>
                       <div className="rating">
-                        <a href="#rating">
-                          <i className="fa-sharp fa-solid fa-star"></i>
-                        </a>
-                        <a href="#rating">
-                          <i className="fa-sharp fa-solid fa-star"></i>
-                        </a>
-                        <a href="#rating">
-                          <i className="fa-sharp fa-solid fa-star"></i>
-                        </a>
-                        <a href="#rating">
-                          <i className="fa-sharp fa-solid fa-star"></i>
-                        </a>
-                        <a href="#rating">
-                          <i className="fa-sharp fa-solid fa-star"></i>
-                        </a>
+                        {[...Array(5)].map((_, index) => (
+                          <a key={index} href="#rating">
+                            <i className="fa-sharp fa-solid fa-star"></i>
+                          </a>
+                        ))}
                       </div>
                       <div className="content">
                         <p className="description">
                           Rainbow-Themes is now a crucial component of our work!
                           We made it simple to collaborate across departments by
-                          grouping our work
+                          grouping our work.
                         </p>
                         <div className="bottom-content">
                           <div className="meta-info-section">
