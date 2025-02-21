@@ -1,10 +1,15 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/app/context/AuthContext"; // AuthContext'ten logout fonksiyonunu al
 
 import avatar from "../../public/images/team/team-01sm.jpg";
 import UserMenuItems from "./HeaderProps/UserMenuItem";
 
 const UserMenu = () => {
+  const { logout } = useAuth(); // Logout fonksiyonunu çağır
+
   return (
     <>
       <div className="inner">
@@ -41,10 +46,10 @@ const UserMenu = () => {
         <hr className="mt--10 mb--10" />
         <ul className="user-list-wrapper">
           <li>
-            <Link href="/signup">
+            <button onClick={logout} className="logout-button">
               <i className="fa-sharp fa-solid fa-right-to-bracket"></i>
               <span>Logout</span>
-            </Link>
+            </button>
           </li>
         </ul>
       </div>

@@ -1,6 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "@/app/context/AuthContext"; // AuthContext'ten token al
+import { useRouter } from "next/navigation";
 import Context from "@/context/Context";
 
 import HeaderTop from "@/components/Header/HeaderTop/HeaderTop";
@@ -11,11 +13,29 @@ import Footer from "@/components/Footers/Footer";
 import Copyright from "@/components/Footers/Copyright";
 
 const HomePage = () => {
+  const { token } = useAuth();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!token) {
+      // Token null ise localStorage kontrolü yapalım
+      setTimeout(() => {
+        if (!localStorage.getItem("authToken")) {
+          router.push("/signin"); // Eğer token yoksa giriş sayfasına yönlendir
+        }
+      }, 500);
+    } else {
+      setLoading(false);
+    }
+  }, [token, router]);
+
+  if (loading) return null; // Auth yüklenirken boş bir ekran göster
+
   return (
     <>
       <main className="page-wrapper">
         <Context>
-          
           <Header
             headerTransparent="header-transparent"
             headerSticky="header-sticky"
