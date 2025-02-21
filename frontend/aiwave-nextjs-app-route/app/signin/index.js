@@ -1,3 +1,7 @@
+"use client";
+import { useState } from "react";
+import { loginUser } from "../api";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -8,6 +12,22 @@ import google from "../../public/images/sign-up/google.png";
 import facebook from "../../public/images/sign-up/facebook.png";
 
 const SigninPage = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const data = await loginUser(email, password);
+      localStorage.setItem("token", data.token); // Token'ı sakla
+      alert("Giriş başarılı!");
+      window.location.href = "/home"; // Kullanıcıyı yönlendir
+    } catch (err) {
+      setError(err.response?.data?.message || "Giriş yapılamadı.");
+    }
+  };
+
   return (
     <>
       <main className="page-wrapper">
@@ -55,7 +75,7 @@ const SigninPage = () => {
                         <span>Or continue with</span>
                         <hr />
                       </div>
-                      <form>
+                      <form onSubmit={handleLogin}>
                         <div className="input-section mail-section">
                           <div className="icon">
                             <i className="fa-sharp fa-regular fa-envelope"></i>
@@ -63,14 +83,24 @@ const SigninPage = () => {
                           <input
                             type="email"
                             placeholder="Enter email address"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
                           />
                         </div>
                         <div className="input-section password-section">
                           <div className="icon">
                             <i className="fa-sharp fa-regular fa-lock"></i>
                           </div>
-                          <input type="password" placeholder="Password" />
+                          <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                          />
                         </div>
+                        {error && <p className="error-message">{error}</p>}
                         <div className="forget-text">
                           <a className="btn-read-more" href="#">
                             <span>Forgot password</span>

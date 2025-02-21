@@ -11,8 +11,7 @@ from routers.page5 import page5_bp
 import config
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": ["http://localhost:8080", "https://yourfrontenddomain.com"]}})
-
+CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}}, supports_credentials=True)
 # Flask config yükleme
 app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
 app.config["JWT_TOKEN_LOCATION"] = config.JWT_TOKEN_LOCATION
