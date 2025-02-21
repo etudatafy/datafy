@@ -1,5 +1,4 @@
-
-
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -8,8 +7,49 @@ import userImg from "../../public/images/team/team-02sm.jpg";
 import brandImg from "../../public/images/brand/brand-t.png";
 import google from "../../public/images/sign-up/google.png";
 import facebook from "../../public/images/sign-up/facebook.png";
+import { useState } from "react";
+import axios from "axios";
 
 const SignupPage = () => {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      setError("Şifreler uyuşmuyor!");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:3000/api/auth/register",
+        {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        }
+      );
+
+      if (response.status === 201) {
+        setSuccess("Kayıt başarılı! Giriş yapabilirsiniz.");
+        setError("");
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || "Bir hata oluştu.");
+    }
+  };
   return (
     <>
       <main className="page-wrapper">
@@ -57,12 +97,18 @@ const SignupPage = () => {
                         <span>Or continue with</span>
                         <hr />
                       </div>
-                      <form>
+                      <form onSubmit={handleSubmit}>
                         <div className="input-section">
                           <div className="icon">
                             <i className="feather-user"></i>
                           </div>
-                          <input type="text" placeholder="Enter Your Name" />
+                          <input
+                            type="text"
+                            name="username"
+                            placeholder="Enter Your Name"
+                            onChange={handleChange}
+                            required
+                          />
                         </div>
                         <div className="input-section mail-section">
                           <div className="icon">
@@ -70,7 +116,10 @@ const SignupPage = () => {
                           </div>
                           <input
                             type="email"
+                            name="email"
                             placeholder="Enter email address"
+                            onChange={handleChange}
+                            required
                           />
                         </div>
                         <div className="input-section password-section">
@@ -79,18 +128,26 @@ const SignupPage = () => {
                           </div>
                           <input
                             type="password"
+                            name="password"
                             placeholder="Create Password"
+                            onChange={handleChange}
+                            required
                           />
-                        </div>{" "}
+                        </div>
                         <div className="input-section password-section">
                           <div className="icon">
                             <i className="fa-sharp fa-regular fa-lock"></i>
                           </div>
                           <input
                             type="password"
+                            name="confirmPassword"
                             placeholder="Confirm Password"
+                            onChange={handleChange}
+                            required
                           />
                         </div>
+                        {error && <p className="error-text">{error}</p>}
+                        {success && <p className="success-text">{success}</p>}
                         <div className="forget-text">
                           <a className="btn-read-more" href="#">
                             <span>Forgot password</span>
