@@ -1,9 +1,11 @@
 import React from "react";
-
+import { useAuth } from "@/app/context/AuthContext"; // Kullanıcı bilgilerini çekmek için
 import ProfileBody from "./ProfileBody";
 import UserNav from "../Common/UserNav";
 
 const ProfileDetails = () => {
+  const { user } = useAuth(); // Kullanıcı bilgilerini AuthContext'ten al
+
   return (
     <>
       <div className="rbt-main-content mb--0">
@@ -13,7 +15,13 @@ const ProfileDetails = () => {
 
             <div className="content-page pb--50">
               <div className="chat-box-list">
-                <ProfileBody />
+                {user ? (
+                  <ProfileBody user={user} />
+                ) : (
+                  <p>
+                    User Bilgisi Bulunmamaktadır, Lütfen Tekrar Giriş Yapınız.
+                  </p>
+                )}
               </div>
             </div>
           </div>

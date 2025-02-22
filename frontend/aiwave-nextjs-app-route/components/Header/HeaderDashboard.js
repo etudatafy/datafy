@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useAppContext } from "@/context/Context";
+import { useAuth } from "@/app/context/AuthContext"; // Auth bilgilerini çekmek için
 
 import logo from "../../public/images/logo/logo.png";
-import avatar from "../../public/images/team/team-01sm.jpg";
+import defaultAvatar from "../../public/images/team/team-01sm.jpg"; // Varsayılan avatar
 
 import Nav from "./Nav";
 import UserMenu from "./UserMenu";
@@ -19,6 +20,8 @@ const HeaderDashboard = ({ display }) => {
     activeMobileMenu,
     setActiveMobileMenu,
   } = useAppContext();
+  const { user } = useAuth(); // Kullanıcı bilgilerini çek
+
   return (
     <>
       <header className="rbt-dashboard-header rainbow-header header-default header-left-align rbt-fluid-header">
@@ -74,11 +77,18 @@ const HeaderDashboard = ({ display }) => {
                     <a className="d-flex align-items-center" href="#">
                       <div className="inner d-flex align-items-center">
                         <div className="img-box">
-                          <Image src={avatar} alt="Admin" />
+                          <Image
+                            src={user?.avatar || defaultAvatar} // Kullanıcının avatarı varsa göster, yoksa default
+                            width={31}
+                            height={31}
+                            alt="Admin"
+                          />
                         </div>
                         <div className="content">
-                          <span className="title ">Rafi Dev</span>
-                          <p>adam@gmail.com</p>
+                          <span className="title">
+                            {user?.username || "Misafir"}
+                          </span>
+                          <p>{user?.email || "Giriş yapın"}</p>
                         </div>
                       </div>
                       <div className="icon">
