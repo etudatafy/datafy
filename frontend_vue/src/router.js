@@ -2,17 +2,17 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from './pages/HomePage.vue';
 import RegisterPage from './pages/RegisterPage.vue';
 import LoginPage from './pages/LoginPage.vue';
-import ChatPage from './pages/ChatPage.vue'; 
-import ChatHistoryPage from './pages/ChatHistoryPage.vue'; 
-import ChatRoomPage from './pages/ChatRoomPage.vue'; 
+import ChatPage from './pages/ChatPage.vue';
+import ExamEntry from './pages/ExamEntry.vue';
+import CalenderPage from './pages/CalenderPage.vue';
 
 const routes = [
   { path: '/ana-sayfa', component: HomePage },
   { path: '/kayit-ol', component: RegisterPage },
   { path: '/giris-yap', component: LoginPage },
   { path: '/yapay-zeka-yardim/:chatId?', component: ChatPage, props: true },
-  { path: '/canli-destek', component: ChatHistoryPage }, 
-  { path: '/sohbet/:userId', component: ChatRoomPage, props: true }, 
+  { path: '/deneme-gir/:id', component: ExamEntry, props: true },
+  { path: '/takvim', component: CalenderPage }
 ];
 
 const router = createRouter({

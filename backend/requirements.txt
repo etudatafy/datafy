@@ -17,4 +17,3 @@ flask_jwt_extended
 flask-pymongo
 dnspython
 bcrypt
-flask-socketio

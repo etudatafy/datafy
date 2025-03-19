@@ -31,8 +31,8 @@
         </router-link>
       </div>
       <div class="col-6">
-        <router-link to="/ayarlar" class="btn btn-secondary w-100 py-3 d-flex align-items-center justify-content-center">
-          <i class="bi bi-gear fs-4 me-2"></i> <span>Ayarlar</span>
+        <router-link to="/takvim" class="btn btn-warning w-100 py-3 d-flex align-items-center justify-content-center">
+          <i class="bi bi-calendar-event fs-4 me-2"></i> <span>Takvim</span>
         </router-link>
       </div>
     </div>
