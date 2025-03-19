@@ -1,0 +1,15 @@
+# Ignore Python bytecode files
+*.pyc
+
+# Ignore node_modules directory
+node_modules/
+# Ignore Next.js build and cache files
+.next/
+# Ignore Next.js build and cache files
+frontend/aiwave-nextjs-app-route/.next/
+
+# Ignore __pycache__ directories
+__pycache__/
+
+
+

@@ -1,0 +1,1 @@
+self.__NEXT_FONT_MANIFEST="{\"pages\":{},\"app\":{\"/Users/zegende/Desktop/datafy/aiwave-nextjs-app-route/app/layout\":[\"static/media/a2117d63e64fe351-s.p.woff2\"]},\"appUsingSizeAdjust\":true,\"pagesUsingSizeAdjust\":false}"
