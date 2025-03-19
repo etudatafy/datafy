@@ -4,6 +4,7 @@ from routers.authentication import auth_bp
 from flask_jwt_extended import JWTManager
 from routers.chat import chat_bp
 from routers.exam import exam_bp
+from routers.progress import progress_bp
 from routers.page1 import page1_bp
 from routers.page2 import page2_bp
 from routers.page3 import page3_bp
@@ -26,6 +27,7 @@ jwt = JWTManager(app)
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(chat_bp, url_prefix='/api/chat')
 app.register_blueprint(exam_bp, url_prefix='/api/exam')
+app.register_blueprint(progress_bp, url_prefix='/api/progress')
 app.register_blueprint(page1_bp, url_prefix='/api/page1')
 app.register_blueprint(page2_bp, url_prefix='/api/page2')
 app.register_blueprint(page3_bp, url_prefix='/api/page3')
