@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-# from model import rag_model 
+#from model import rag_model 
 
 page1_bp = Blueprint('page1', __name__)
 
@@ -15,6 +15,6 @@ def page1_data():
     if not data or 'message' not in data:
         return jsonify({"error": "The 'message' attribute is missing from the request data."}), 400
     user_prompt = data['message']
-    response = "Hello World" #rag_model.generate_response(user_prompt) 
+    response = "Hello World"#rag_model.generate_response(user_prompt) 
     
     return jsonify({"response": response})

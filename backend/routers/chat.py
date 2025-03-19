@@ -92,7 +92,7 @@ def chat():
             return jsonify({"error": "Sohbet bulunamadı"}), 404
 
         # LLM'den yanıt al
-        model_response ="Hello World" # rag_model.generate_response(user_message)
+        model_response = "Hello World" #rag_model.generate_response(user_message)
 
         messages = add_message_to_chat(user_id, chat_id, model_response, "receiver")
 

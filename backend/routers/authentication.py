@@ -94,28 +94,3 @@ def login():
         users_collection.update_one({"_id": ObjectId(user_id)}, {"$set": {"token_expiry": exp_time}})
 
     return jsonify({'token': token}), 200
-
-@auth_bp.route('/user', methods=['GET'])
-def get_user_info():
-    token = request.headers.get("Authorization")
-    if not token:
-        return jsonify({"message": "Token gerekli!"}), 401
-
-    token = token.replace("Bearer ", "")  # "Bearer " kısmını temizle
-    try:
-        payload = jwt.decode(token, config.JWT_SECRET_KEY, algorithms=["HS256"])
-        user_id = payload.get("sub")
-
-        user = users_collection.find_one({"_id": ObjectId(user_id)}, {"password": 0, "salt": 0})  # Şifreyi döndürme
-
-        if not user:
-            return jsonify({"message": "Kullanıcı bulunamadı!"}), 404
-
-        user["_id"] = str(user["_id"])  # ObjectId'yi string'e çevir
-        return jsonify(user), 200
-
-    except jwt.ExpiredSignatureError:
-        return jsonify({"message": "Token süresi dolmuş!"}), 401
-    except jwt.InvalidTokenError:
-        return jsonify({"message": "Geçersiz token!"}), 401
-
