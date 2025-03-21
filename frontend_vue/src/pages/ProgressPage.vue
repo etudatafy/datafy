@@ -458,5 +458,3 @@ export default {
   }
 }
 </script>
-
-<!-- No custom CSS; Bootstrap 5 classes are used exclusively -->
