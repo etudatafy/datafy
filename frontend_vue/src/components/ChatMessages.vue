@@ -1,5 +1,5 @@
 <template>
-  <div ref="messagesContainer" class="d-flex flex-column gap-2 w-75 chat-messages">
+  <div ref="messagesContainer" class="d-flex flex-column gap-2 chat-messages">
     <div 
       v-for="(msg, index) in messages" 
       :key="index"
