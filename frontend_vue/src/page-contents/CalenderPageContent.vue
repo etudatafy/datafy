@@ -9,7 +9,9 @@
           <!-- Gelecek Sınavlar -->
           <div class="card shadow mb-4">
             <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-3">
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
                 <h3 class="card-title fw-bold mb-0">⏳ Gelecek Sınavlar</h3>
                 <button class="btn btn-success" @click="showFutureModal = true">
                   <i class="bi bi-plus-circle me-1"></i> Sınav Ekle
@@ -40,14 +42,18 @@
                   </div>
                 </li>
               </ul>
-              <p v-else class="text-muted text-center">Henüz bir sınav eklenmedi.</p>
+              <p v-else class="text-muted text-center">
+                Henüz bir sınav eklenmedi.
+              </p>
             </div>
           </div>
 
           <!-- Geçmiş Sınavlar -->
           <div class="card shadow">
             <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-3">
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
                 <h3 class="card-title fw-bold mb-0">📌 Geçmiş Sınavlar</h3>
                 <button class="btn btn-success" @click="showPastModal = true">
                   <i class="bi bi-plus-circle me-1"></i> Sınav Ekle
@@ -81,7 +87,9 @@
                   </div>
                 </li>
               </ul>
-              <p v-else class="text-muted text-center">Henüz bir sınav eklenmedi.</p>
+              <p v-else class="text-muted text-center">
+                Henüz bir sınav eklenmedi.
+              </p>
             </div>
           </div>
         </div>
@@ -90,12 +98,16 @@
 
     <!-- Modal aynı kaldı -->
     <div v-if="showFutureModal || showPastModal">
-      <div class="modal fade show" style="display: block;" tabindex="-1">
+      <div class="modal fade show" style="display: block" tabindex="-1">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">Yeni Sınav Ekle</h5>
-              <button type="button" class="btn-close" @click="closeModal"></button>
+              <button
+                type="button"
+                class="btn-close"
+                @click="closeModal"
+              ></button>
             </div>
             <div class="modal-body">
               <label class="form-label">Sınav İsmi:</label>
@@ -106,62 +118,71 @@
                 placeholder="Deneme Adı"
               />
               <label class="form-label mt-3">Tarih:</label>
-              <input
-                type="date"
-                v-model="newExam.date"
-                class="form-control"
-              />
+              <input type="date" v-model="newExam.date" class="form-control" />
             </div>
             <div class="modal-footer">
               <button class="btn btn-secondary" @click="closeModal">
                 İptal
               </button>
-              <button class="btn btn-success" @click="addExam">
-                Ekle
-              </button>
+              <button class="btn btn-success" @click="addExam">Ekle</button>
             </div>
           </div>
         </div>
       </div>
       <div class="modal-backdrop fade show"></div>
     </div>
+    <SessionExpiredWarning
+      :show="showSessionExpired"
+      @confirm="handleSessionExpiredConfirm"
+    />
   </PageLayout>
 </template>
 
 <script>
-import PageLayout from '../layout/PageLayout.vue';
+import PageLayout from "../layout/PageLayout.vue";
+import SessionExpiredWarning from "../warnings/SessionExpiredWarning.vue";
 
 export default {
-  name: 'CalenderPageContent',
-  components: { PageLayout },
+  name: "CalenderPageContent",
+  components: { PageLayout, SessionExpiredWarning },
   data() {
     return {
       showFutureModal: false,
       showPastModal: false,
-      newExam: { name: '', date: '' },
+      newExam: { name: "", date: "" },
       exams: [],
-      token: localStorage.getItem('jwt_token') || '',
+      token: localStorage.getItem("jwt_token") || "",
+      showSessionExpired: false,
     };
   },
   computed: {
     futureExams() {
       return this.exams
-        .filter(e => new Date(e.date) >= new Date())
+        .filter((e) => new Date(e.date) >= new Date())
         .sort((a, b) => new Date(a.date) - new Date(b.date));
     },
     pastExams() {
       return this.exams
-        .filter(e => new Date(e.date) < new Date())
+        .filter((e) => new Date(e.date) < new Date())
         .sort((a, b) => new Date(b.date) - new Date(a.date));
     },
   },
   methods: {
+    handleSessionExpiredConfirm() {
+      this.showSessionExpired = false;
+      localStorage.removeItem('jwt_token');
+      this.$router.push('/giris-yap');
+    },
     async fetchExams() {
       try {
-        const res = await fetch('http://localhost:3000/api/exam/fetch-exams', {
+        const res = await fetch("http://localhost:3000/api/exam/fetch-exams", {
           headers: { Authorization: `Bearer ${this.token}` },
         });
         const data = await res.json();
+        if (res.status === 401 && data.msg === "Token has expired") {
+          this.showSessionExpired = true;
+          return;
+        }
         if (res.ok) this.exams = data;
       } catch (err) {
         console.error(err);
@@ -169,17 +190,24 @@ export default {
     },
     async addExam() {
       if (!this.newExam.name || !this.newExam.date) {
-        return alert('Tüm alanları doldurun!');
+        return alert("Tüm alanları doldurun!");
       }
       try {
-        const res = await fetch('http://localhost:3000/api/exam/add', {
-          method: 'POST',
+        const res = await fetch("http://localhost:3000/api/exam/add", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${this.token}`,
           },
           body: JSON.stringify(this.newExam),
         });
+
+        const data = await res.json();
+        if (res.status === 401 && data.msg === 'Token has expired') {
+          this.showSessionExpired = true;
+          return;
+        }
+
         if (res.ok) {
           this.fetchExams();
           this.closeModal();
@@ -189,17 +217,22 @@ export default {
       }
     },
     async deleteExam(id) {
-      if (!confirm('Silmek istediğinize emin misiniz?')) return;
+      if (!confirm("Silmek istediğinize emin misiniz?")) return;
       try {
-        const res = await fetch('http://localhost:3000/api/exam/delete-exam', {
-          method: 'POST',
+        const res = await fetch("http://localhost:3000/api/exam/delete-exam", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${this.token}`,
           },
           body: JSON.stringify({ exam_id: id }),
         });
-        if (res.ok) this.exams = this.exams.filter(e => e.id !== id);
+        const data = await res.json();
+        if (res.status === 401 && data.msg === 'Token has expired') {
+          this.showSessionExpired = true;
+          return;
+        }
+        if (res.ok) this.exams = this.exams.filter((e) => e.id !== id);
       } catch (err) {
         console.error(err);
       }
@@ -207,7 +240,7 @@ export default {
     closeModal() {
       this.showFutureModal = false;
       this.showPastModal = false;
-      this.newExam = { name: '', date: '' };
+      this.newExam = { name: "", date: "" };
     },
   },
   mounted() {

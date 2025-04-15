@@ -4,7 +4,9 @@
       <div class="col-12 col-md-10 col-lg-10">
         <!-- Orijinal renkli başlık bloğu -->
         <div class="row mb-4">
-          <div class="col-12 text-center text-white bg-success py-4 px-4 rounded-3">
+          <div
+            class="col-12 text-center text-white bg-success py-4 px-4 rounded-3"
+          >
             <h1 class="fw-bold mb-2">Gelişim Analiz Sayfası</h1>
             <p class="mb-0">Sınav performansınızı grafiklerle analiz edin</p>
           </div>
@@ -24,7 +26,9 @@
           </div>
           <div class="col-md-6">
             <div class="card shadow-sm border-success h-100">
-              <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+              <div
+                class="card-header bg-success text-white d-flex justify-content-between align-items-center"
+              >
                 <span class="fw-bold">TYT Çizgi Grafiği</span>
                 <select
                   class="form-select form-select-sm w-50"
@@ -59,7 +63,9 @@
           </div>
           <div class="col-md-6">
             <div class="card shadow-sm border-success h-100">
-              <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+              <div
+                class="card-header bg-success text-white d-flex justify-content-between align-items-center"
+              >
                 <span class="fw-bold">AYT Çizgi Grafiği</span>
                 <select
                   class="form-select form-select-sm w-50"
@@ -106,14 +112,20 @@
         </div>
       </div>
     </div>
+    <SessionExpiredWarning
+      :show="showSessionExpired"
+      @confirm="handleSessionExpiredConfirm"
+    />
   </div>
 </template>
 
 <script>
-import ApexCharts from "apexcharts"
+import ApexCharts from "apexcharts";
+import SessionExpiredWarning from "../warnings/SessionExpiredWarning.vue";
 
 export default {
   name: "ProgressAnalysis",
+  components: { SessionExpiredWarning },
   data() {
     return {
       exams: [],
@@ -126,59 +138,74 @@ export default {
       aytLineChart: null,
       combinedRadarChart: null,
       selectedTytLineSubject: "toplam",
-      selectedAytLineSubject: "toplam"
-    }
+      selectedAytLineSubject: "toplam",
+      showSessionExpired: false,
+    };
   },
   methods: {
+    handleSessionExpiredConfirm() {
+      this.showSessionExpired = false
+      localStorage.removeItem("jwt_token")
+      this.$router.push("/giris-yap")
+   },
     async fetchProgress() {
-      this.loading = true
+      this.loading = true;
       try {
-        const res = await fetch("http://localhost:3000/api/progress/exam-details", {
-          headers: { Authorization: `Bearer ${this.token}` }
-        })
-        const body = await res.json()
+        const res = await fetch(
+          "http://localhost:3000/api/progress/exam-details",
+          {
+            headers: { Authorization: `Bearer ${this.token}` },
+          }
+        );
+        const body = await res.json();
+        if (res.status === 401 && body.msg === "Token has expired") {
+          this.showSessionExpired = true;
+          return;
+        }
         if (res.ok) {
-          this.exams = Array.isArray(body) ? body : body.exams
-          this.initTytStackedChart()
-          this.initAytStackedChart()
-          this.initTytLineChart()
-          this.initAytLineChart()
-          this.initCombinedRadarChart()
+          this.exams = Array.isArray(body) ? body : body.exams;
+          this.initTytStackedChart();
+          this.initAytStackedChart();
+          this.initTytLineChart();
+          this.initAytLineChart();
+          this.initCombinedRadarChart();
         } else {
-          this.error = body.error || "Veri alınırken hata oluştu."
+          this.error = body.error || "Veri alınırken hata oluştu.";
         }
       } catch (err) {
-        this.error = "Bağlantı hatası!"
+        this.error = "Bağlantı hatası!";
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
     getSortedExams() {
-      return [...this.exams].sort((a, b) => new Date(a.date) - new Date(b.date))
+      return [...this.exams].sort(
+        (a, b) => new Date(a.date) - new Date(b.date)
+      );
     },
     initTytStackedChart() {
-      if (this.tytStackedChart) this.tytStackedChart.destroy()
-      const sorted = this.getSortedExams()
-      const categories = []
-      const turkceData = []
-      const matematikData = []
-      const sosyalData = []
-      const fenData = []
-      sorted.forEach(exam => {
+      if (this.tytStackedChart) this.tytStackedChart.destroy();
+      const sorted = this.getSortedExams();
+      const categories = [];
+      const turkceData = [];
+      const matematikData = [];
+      const sosyalData = [];
+      const fenData = [];
+      sorted.forEach((exam) => {
         if (exam.results && exam.results.TYT) {
-          const t = exam.results.TYT.turkce || 0
-          const m = exam.results.TYT.matematik || 0
-          const s = exam.results.TYT.sosyal || 0
-          const f = exam.results.TYT.fen || 0
+          const t = exam.results.TYT.turkce || 0;
+          const m = exam.results.TYT.matematik || 0;
+          const s = exam.results.TYT.sosyal || 0;
+          const f = exam.results.TYT.fen || 0;
           if (t + m + s + f > 0) {
-            categories.push(exam.name)
-            turkceData.push(t)
-            matematikData.push(m)
-            sosyalData.push(s)
-            fenData.push(f)
+            categories.push(exam.name);
+            turkceData.push(t);
+            matematikData.push(m);
+            sosyalData.push(s);
+            fenData.push(f);
           }
         }
-      })
+      });
       const options = {
         chart: { type: "bar", height: 250, stacked: true },
         plotOptions: { bar: { horizontal: false } },
@@ -188,44 +215,47 @@ export default {
           { name: "Türkçe", data: turkceData },
           { name: "Matematik", data: matematikData },
           { name: "Sosyal", data: sosyalData },
-          { name: "Fen", data: fenData }
-        ]
-      }
-      this.tytStackedChart = new ApexCharts(document.querySelector("#tytStackedChart"), options)
-      this.tytStackedChart.render()
+          { name: "Fen", data: fenData },
+        ],
+      };
+      this.tytStackedChart = new ApexCharts(
+        document.querySelector("#tytStackedChart"),
+        options
+      );
+      this.tytStackedChart.render();
     },
     initAytStackedChart() {
-      if (this.aytStackedChart) this.aytStackedChart.destroy()
-      const sorted = this.getSortedExams()
-      const categories = []
-      const edebiyatData = []
-      const matematikData = []
-      const sosyalData = []
-      const fenData = []
-      sorted.forEach(exam => {
+      if (this.aytStackedChart) this.aytStackedChart.destroy();
+      const sorted = this.getSortedExams();
+      const categories = [];
+      const edebiyatData = [];
+      const matematikData = [];
+      const sosyalData = [];
+      const fenData = [];
+      sorted.forEach((exam) => {
         if (exam.results && exam.results.AYT) {
-          const t = exam.results.AYT.edebiyat || 0
-          const m = exam.results.AYT.matematik_ayt || 0
+          const t = exam.results.AYT.edebiyat || 0;
+          const m = exam.results.AYT.matematik_ayt || 0;
           const s =
             (exam.results.AYT.tarih_1 || 0) +
             (exam.results.AYT.cografya_1 || 0) +
             (exam.results.AYT.tarih_2 || 0) +
             (exam.results.AYT.cografya_2 || 0) +
             (exam.results.AYT.felsefe || 0) +
-            (exam.results.AYT.din || 0)
+            (exam.results.AYT.din || 0);
           const f =
             (exam.results.AYT.fizik || 0) +
             (exam.results.AYT.kimya || 0) +
-            (exam.results.AYT.biyoloji || 0)
+            (exam.results.AYT.biyoloji || 0);
           if (t + m + s + f > 0) {
-            categories.push(exam.name)
-            edebiyatData.push(t)
-            matematikData.push(m)
-            sosyalData.push(s)
-            fenData.push(f)
+            categories.push(exam.name);
+            edebiyatData.push(t);
+            matematikData.push(m);
+            sosyalData.push(s);
+            fenData.push(f);
           }
         }
-      })
+      });
       const options = {
         chart: { type: "bar", height: 250, stacked: true },
         plotOptions: { bar: { horizontal: false } },
@@ -235,36 +265,42 @@ export default {
           { name: "Türkçe", data: edebiyatData },
           { name: "Matematik", data: matematikData },
           { name: "Sosyal", data: sosyalData },
-          { name: "Fen", data: fenData }
-        ]
-      }
-      this.aytStackedChart = new ApexCharts(document.querySelector("#aytStackedChart"), options)
-      this.aytStackedChart.render()
+          { name: "Fen", data: fenData },
+        ],
+      };
+      this.aytStackedChart = new ApexCharts(
+        document.querySelector("#aytStackedChart"),
+        options
+      );
+      this.aytStackedChart.render();
     },
     initTytLineChart() {
-      if (this.tytLineChart) this.tytLineChart.destroy()
-      const options = this.getTytLineChartOptions(this.selectedTytLineSubject)
-      this.tytLineChart = new ApexCharts(document.querySelector("#tytLineChart"), options)
-      this.tytLineChart.render()
+      if (this.tytLineChart) this.tytLineChart.destroy();
+      const options = this.getTytLineChartOptions(this.selectedTytLineSubject);
+      this.tytLineChart = new ApexCharts(
+        document.querySelector("#tytLineChart"),
+        options
+      );
+      this.tytLineChart.render();
     },
     getTytLineChartOptions(subjectOption) {
-      const sorted = this.getSortedExams()
-      const categories = []
-      const data = []
+      const sorted = this.getSortedExams();
+      const categories = [];
+      const data = [];
       if (subjectOption === "toplam") {
-        sorted.forEach(exam => {
+        sorted.forEach((exam) => {
           if (exam.results && exam.results.TYT) {
-            const t = exam.results.TYT.turkce || 0
-            const m = exam.results.TYT.matematik || 0
-            const s = exam.results.TYT.sosyal || 0
-            const f = exam.results.TYT.fen || 0
-            const total = t + m + s + f
+            const t = exam.results.TYT.turkce || 0;
+            const m = exam.results.TYT.matematik || 0;
+            const s = exam.results.TYT.sosyal || 0;
+            const f = exam.results.TYT.fen || 0;
+            const total = t + m + s + f;
             if (total > 0) {
-              categories.push(exam.name)
-              data.push(total)
+              categories.push(exam.name);
+              data.push(total);
             }
           }
-        })
+        });
       } else {
         const field =
           subjectOption === "Türkçe"
@@ -273,91 +309,96 @@ export default {
             ? "matematik"
             : subjectOption === "Sosyal"
             ? "sosyal"
-            : "fen"
-        sorted.forEach(exam => {
+            : "fen";
+        sorted.forEach((exam) => {
           if (exam.results && exam.results.TYT) {
-            const val = exam.results.TYT[field] || 0
+            const val = exam.results.TYT[field] || 0;
             if (val > 0) {
-              categories.push(exam.name)
-              data.push(val)
+              categories.push(exam.name);
+              data.push(val);
             }
           }
-        })
+        });
       }
       let maxY =
         subjectOption === "toplam"
           ? 120
           : subjectOption === "Sosyal" || subjectOption === "Fen"
           ? 20
-          : 40
+          : 40;
       return {
         chart: { type: "line", height: 250 },
         xaxis: { categories, labels: { style: { fontSize: "10px" } } },
         yaxis: { min: 0, max: maxY },
-        series: [{ name: subjectOption, data }]
-      }
+        series: [{ name: subjectOption, data }],
+      };
     },
     updateTytLineChart() {
       if (this.tytLineChart) {
-        this.tytLineChart.updateOptions(this.getTytLineChartOptions(this.selectedTytLineSubject))
+        this.tytLineChart.updateOptions(
+          this.getTytLineChartOptions(this.selectedTytLineSubject)
+        );
       }
     },
     initAytLineChart() {
-      if (this.aytLineChart) this.aytLineChart.destroy()
-      const options = this.getAytLineChartOptions(this.selectedAytLineSubject)
-      this.aytLineChart = new ApexCharts(document.querySelector("#aytLineChart"), options)
-      this.aytLineChart.render()
+      if (this.aytLineChart) this.aytLineChart.destroy();
+      const options = this.getAytLineChartOptions(this.selectedAytLineSubject);
+      this.aytLineChart = new ApexCharts(
+        document.querySelector("#aytLineChart"),
+        options
+      );
+      this.aytLineChart.render();
     },
     getAytLineChartOptions(subjectOption) {
-      const sorted = this.getSortedExams()
-      const categories = []
-      const data = []
+      const sorted = this.getSortedExams();
+      const categories = [];
+      const data = [];
       if (subjectOption === "toplam") {
-        sorted.forEach(exam => {
+        sorted.forEach((exam) => {
           if (exam.results && exam.results.AYT) {
-            const t = exam.results.AYT.edebiyat || 0
-            const m = exam.results.AYT.matematik_ayt || 0
+            const t = exam.results.AYT.edebiyat || 0;
+            const m = exam.results.AYT.matematik_ayt || 0;
             const s =
               (exam.results.AYT.tarih_1 || 0) +
               (exam.results.AYT.cografya_1 || 0) +
               (exam.results.AYT.tarih_2 || 0) +
               (exam.results.AYT.cografya_2 || 0) +
               (exam.results.AYT.felsefe || 0) +
-              (exam.results.AYT.din || 0)
+              (exam.results.AYT.din || 0);
             const f =
               (exam.results.AYT.fizik || 0) +
               (exam.results.AYT.kimya || 0) +
-              (exam.results.AYT.biyoloji || 0)
-            const total = t + m + s + f
+              (exam.results.AYT.biyoloji || 0);
+            const total = t + m + s + f;
             if (total > 0) {
-              categories.push(exam.name)
-              data.push(total)
+              categories.push(exam.name);
+              data.push(total);
             }
           }
-        })
+        });
       } else {
         if (subjectOption === "Türkçe") {
-          sorted.forEach(exam => {
+          sorted.forEach((exam) => {
             if (exam.results && exam.results.AYT) {
-              const val = exam.results.AYT.edebiyat || 0
+              const val = exam.results.AYT.edebiyat || 0;
               if (val > 0) {
-                categories.push(exam.name)
-                data.push(val)
+                categories.push(exam.name);
+                data.push(val);
               }
             }
-          })
+          });
         } else if (subjectOption === "Matematik") {
-          sorted.forEach(exam => {
+          sorted.forEach((exam) => {
             if (exam.results && exam.results.AYT) {
-              const val = exam.results.AYT.matematik_ayt || 0
+              const val = exam.results.AYT.matematik_ayt || 0;
               if (val > 0) {
-                categories.push(exam.name)
-                data.push(val)
+                categories.push(exam.name);
+                data.push(val);
               }
             }
-          })
+          });
         } else if (subjectOption === "Sosyal") {
-          sorted.forEach(exam => {
+          sorted.forEach((exam) => {
             if (exam.results && exam.results.AYT) {
               const val =
                 (exam.results.AYT.tarih_1 || 0) +
@@ -365,81 +406,86 @@ export default {
                 (exam.results.AYT.tarih_2 || 0) +
                 (exam.results.AYT.cografya_2 || 0) +
                 (exam.results.AYT.felsefe || 0) +
-                (exam.results.AYT.din || 0)
+                (exam.results.AYT.din || 0);
               if (val > 0) {
-                categories.push(exam.name)
-                data.push(val)
+                categories.push(exam.name);
+                data.push(val);
               }
             }
-          })
+          });
         } else if (subjectOption === "Fen") {
-          sorted.forEach(exam => {
+          sorted.forEach((exam) => {
             if (exam.results && exam.results.AYT) {
               const val =
                 (exam.results.AYT.fizik || 0) +
                 (exam.results.AYT.kimya || 0) +
-                (exam.results.AYT.biyoloji || 0)
+                (exam.results.AYT.biyoloji || 0);
               if (val > 0) {
-                categories.push(exam.name)
-                data.push(val)
+                categories.push(exam.name);
+                data.push(val);
               }
             }
-          })
+          });
         }
       }
-      let maxY = subjectOption === "toplam" ? 160 : 40
+      let maxY = subjectOption === "toplam" ? 160 : 40;
       return {
         chart: { type: "line", height: 250 },
         xaxis: { categories, labels: { style: { fontSize: "10px" } } },
         yaxis: { min: 0, max: maxY },
-        series: [{ name: subjectOption, data }]
-      }
+        series: [{ name: subjectOption, data }],
+      };
     },
     updateAytLineChart() {
       if (this.aytLineChart) {
-        this.aytLineChart.updateOptions(this.getAytLineChartOptions(this.selectedAytLineSubject))
+        this.aytLineChart.updateOptions(
+          this.getAytLineChartOptions(this.selectedAytLineSubject)
+        );
       }
     },
     initCombinedRadarChart() {
-      if (this.combinedRadarChart) this.combinedRadarChart.destroy()
-      const categories = ["Türkçe", "Matematik", "Sosyal", "Fen"]
+      if (this.combinedRadarChart) this.combinedRadarChart.destroy();
+      const categories = ["Türkçe", "Matematik", "Sosyal", "Fen"];
       const tytAverages = this.getOverallAverage("TYT", [
         "turkce",
         "matematik",
         "sosyal",
-        "fen"
-      ])
+        "fen",
+      ]);
       const aytAverages = this.getOverallAverage("AYT", [
         "edebiyat",
         "matematik_ayt",
         "sosyal",
-        "fen"
-      ])
+        "fen",
+      ]);
       const options = {
         chart: { type: "radar", height: 250 },
         series: [
           { name: "TYT", data: tytAverages },
-          { name: "AYT", data: aytAverages }
+          { name: "AYT", data: aytAverages },
         ],
         labels: categories,
-        yaxis: { show: true, min: 0 }
-      }
-      this.combinedRadarChart = new ApexCharts(document.querySelector("#combinedRadarChart"), options)
-      this.combinedRadarChart.render()
+        yaxis: { show: true, min: 0 },
+      };
+      this.combinedRadarChart = new ApexCharts(
+        document.querySelector("#combinedRadarChart"),
+        options
+      );
+      this.combinedRadarChart.render();
     },
     getOverallAverage(examType, fields) {
-      let sums = {}
-      fields.forEach(f => (sums[f] = 0))
-      let count = 0
-      this.exams.forEach(exam => {
+      let sums = {};
+      fields.forEach((f) => (sums[f] = 0));
+      let count = 0;
+      this.exams.forEach((exam) => {
         if (exam.results && exam.results[examType]) {
-          count++
+          count++;
           if (examType === "TYT") {
-            fields.forEach(f => {
-              sums[f] += exam.results.TYT[f] || 0
-            })
+            fields.forEach((f) => {
+              sums[f] += exam.results.TYT[f] || 0;
+            });
           } else {
-            fields.forEach(f => {
+            fields.forEach((f) => {
               if (f === "sosyal") {
                 const social =
                   (exam.results.AYT.tarih_1 || 0) +
@@ -447,26 +493,28 @@ export default {
                   (exam.results.AYT.tarih_2 || 0) +
                   (exam.results.AYT.cografya_2 || 0) +
                   (exam.results.AYT.felsefe || 0) +
-                  (exam.results.AYT.din || 0)
-                sums[f] += social
+                  (exam.results.AYT.din || 0);
+                sums[f] += social;
               } else if (f === "fen") {
                 const fen =
                   (exam.results.AYT.fizik || 0) +
                   (exam.results.AYT.kimya || 0) +
-                  (exam.results.AYT.biyoloji || 0)
-                sums[f] += fen
+                  (exam.results.AYT.biyoloji || 0);
+                sums[f] += fen;
               } else {
-                sums[f] += exam.results.AYT[f] || 0
+                sums[f] += exam.results.AYT[f] || 0;
               }
-            })
+            });
           }
         }
-      })
-      return fields.map(f => (count ? parseFloat((sums[f] / count).toFixed(2)) : 0))
-    }
+      });
+      return fields.map((f) =>
+        count ? parseFloat((sums[f] / count).toFixed(2)) : 0
+      );
+    },
   },
   mounted() {
-    this.fetchProgress()
-  }
-}
+    this.fetchProgress();
+  },
+};
 </script>

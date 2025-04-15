@@ -21,15 +21,20 @@
         :loading="loading"
       />
     </div>
+    <SessionExpiredWarning
+      :show="showSessionExpired"
+      @confirm="handleSessionExpiredConfirm"
+    />
   </div>
 </template>
 
 <script>
 import ChatMessages from "../components/ChatMessages.vue";
 import ChatInput from "../components/ChatInput.vue";
+import SessionExpiredWarning from "../warnings/SessionExpiredWarning.vue";
 
 export default {
-  components: { ChatMessages, ChatInput },
+  components: { ChatMessages, ChatInput, SessionExpiredWarning },
   data() {
     return {
       userMessage: "",
@@ -37,6 +42,7 @@ export default {
       loading: false,
       chatId: this.$route.params.chatId || null,
       token: localStorage.getItem("jwt_token") || "",
+      showSessionExpired: false
     };
   },
   created() {
@@ -45,6 +51,11 @@ export default {
     }
   },
   methods: {
+    handleSessionExpiredConfirm() {
+      this.showSessionExpired = false;
+      localStorage.removeItem("jwt_token");
+      this.$router.push("/giris-yap");
+    },
     async loadChatHistory() {
       if (!this.token) return;
 
@@ -56,6 +67,12 @@ export default {
         });
 
         const result = await response.json();
+
+        if (response.status === 401 && result.msg === "Token has expired") {
+          this.showSessionExpired = true;
+          return;
+        }
+
         if (response.ok && result.messages) {
           this.messages = result.messages;
           this.scrollToBottom();
@@ -91,6 +108,11 @@ export default {
         });
 
         const result = await response.json();
+        if (response.status === 401 && result.msg === "Token has expired") {
+          this.showSessionExpired = true;
+          return;
+        }
+
         if (response.ok) {
           if (!this.chatId && result.chatId) {
             this.chatId = result.chatId;

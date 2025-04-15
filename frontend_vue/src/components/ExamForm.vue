@@ -4,18 +4,37 @@
 
     <div class="mb-3">
       <label for="examName" class="form-label fw-semibold">Deneme Adı:</label>
-      <input type="text" v-model="examName" class="form-control" id="examName" placeholder="Deneme adını girin" />
+      <input
+        type="text"
+        v-model="examName"
+        class="form-control"
+        id="examName"
+        placeholder="Deneme adını girin"
+      />
     </div>
 
     <div class="mb-3">
-      <label for="examDate" class="form-label fw-semibold">Deneme Tarihi:</label>
-      <input type="date" v-model="examDate" class="form-control" id="examDate" />
+      <label for="examDate" class="form-label fw-semibold"
+        >Deneme Tarihi:</label
+      >
+      <input
+        type="date"
+        v-model="examDate"
+        class="form-control"
+        id="examDate"
+      />
     </div>
 
     <div v-for="(exam, index) in exams" :key="index" class="mt-4">
       <h3 class="fw-bold">{{ exam.title }}</h3>
-      <div v-for="(subject, sIndex) in exam.subjects" :key="sIndex" class="mb-2">
-        <label :for="subject.name" class="form-label">{{ subject.label }}:</label>
+      <div
+        v-for="(subject, sIndex) in exam.subjects"
+        :key="sIndex"
+        class="mb-2"
+      >
+        <label :for="subject.name" class="form-label"
+          >{{ subject.label }}:</label
+        >
         <div class="input-group">
           <input
             type="number"
@@ -33,14 +52,27 @@
     </div>
 
     <div class="d-flex justify-content-between mt-3">
-      <button v-if="examId" class="btn btn-danger" @click="deleteExam">Sil</button>
-      <button class="btn btn-success ms-auto" @click="submitScores">Kaydet</button>
+      <button v-if="examId" class="btn btn-danger" @click="deleteExam">
+        Sil
+      </button>
+      <button class="btn btn-success ms-auto" @click="submitScores">
+        Kaydet
+      </button>
     </div>
+    <SessionExpiredWarning
+      :show="showSessionExpired"
+      @confirm="handleSessionExpiredConfirm"
+    />
   </div>
 </template>
 
 <script>
+import SessionExpiredWarning from "../warnings/SessionExpiredWarning.vue";
+
 export default {
+  components: {
+    SessionExpiredWarning,
+  },
   props: {
     examData: {
       type: Object,
@@ -69,7 +101,12 @@ export default {
             { name: "fizik", label: "Fizik", score: 0, max: 14 },
             { name: "kimya", label: "Kimya", score: 0, max: 13 },
             { name: "biyoloji", label: "Biyoloji", score: 0, max: 13 },
-            { name: "edebiyat", label: "Türk Dili ve Edebiyatı", score: 0, max: 24 },
+            {
+              name: "edebiyat",
+              label: "Türk Dili ve Edebiyatı",
+              score: 0,
+              max: 24,
+            },
             { name: "tarih_1", label: "Tarih-1", score: 0, max: 10 },
             { name: "cografya_1", label: "Coğrafya-1", score: 0, max: 6 },
             { name: "tarih_2", label: "Tarih-2", score: 0, max: 11 },
@@ -79,6 +116,7 @@ export default {
           ],
         },
       ],
+      showSessionExpired: false,
     };
   },
   watch: {
@@ -107,6 +145,12 @@ export default {
     },
   },
   methods: {
+    handleSessionExpiredConfirm() {
+      this.showSessionExpired = false;
+      localStorage.removeItem("jwt_token");
+      this.$router.push("/giris-yap");
+    },
+
     async submitScores() {
       if (!this.examName || !this.examDate) {
         alert("Lütfen deneme ismini ve tarihini giriniz.");
@@ -127,13 +171,25 @@ export default {
       };
 
       try {
-        const response = await fetch("http://localhost:3000/api/exam/edit-exam", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jwt_token")}` },
-          body: JSON.stringify(results),
-        });
+        const response = await fetch(
+          "http://localhost:3000/api/exam/edit-exam",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
+            },
+            body: JSON.stringify(results),
+          }
+        );
 
         const result = await response.json();
+
+        if (response.status === 401 && result.msg === "Token has expired") {
+          this.showSessionExpired = true;
+          return;
+        }
+
         if (response.ok) {
           alert("Sınav başarıyla güncellendi!");
           this.$router.push("/takvim");
@@ -148,13 +204,25 @@ export default {
       if (!confirm("Bu sınavı silmek istediğinize emin misiniz?")) return;
 
       try {
-        const response = await fetch("http://localhost:3000/api/exam/delete-exam", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jwt_token")}` },
-          body: JSON.stringify({ exam_id: this.examId }),
-        });
+        const response = await fetch(
+          "http://localhost:3000/api/exam/delete-exam",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
+            },
+            body: JSON.stringify({ exam_id: this.examId }),
+          }
+        );
 
         const result = await response.json();
+
+        if (response.status === 401 && result.msg === "Token has expired") {
+          this.showSessionExpired = true;
+          return;
+        }
+
         if (response.ok) {
           alert("Sınav başarıyla silindi!");
           this.$router.push("/takvim");
