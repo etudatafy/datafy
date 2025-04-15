@@ -17,20 +17,26 @@
     <div v-if="responseMessage" class="alert mt-3 w-50 text-center" :class="responseClass">
       {{ responseMessage }}
     </div>
+    <SessionExpiredWarning
+      :show="showSessionExpired"
+      @confirm="handleSessionExpiredConfirm"
+    />
   </div>
 </template>
 
 <script>
 import ExamForm from "../components/ExamForm.vue";
+import SessionExpiredWarning from "../warnings/SessionExpiredWarning.vue";
 
 export default {
-  components: { ExamForm },
+  components: { ExamForm, SessionExpiredWarning },
   data() {
     return {
       examData: null,
       responseMessage: "",
       responseClass: "",
       token: localStorage.getItem("jwt_token") || "",
+      showSessionExpired: false
     };
   },
   async created() {
@@ -43,6 +49,11 @@ export default {
           body: JSON.stringify({ exam_id: examId }),
         });
         const result = await response.json();
+
+        if (response.status === 401 && result.msg === "Token has expired") {
+          this.showSessionExpired = true;
+          return;
+        }
         console.log("Gelen sınav verisi:", result);
 
         if (response.ok && result) {
@@ -59,6 +70,11 @@ export default {
     }
   },
   methods: {
+    handleSessionExpiredConfirm() {
+      this.showSessionExpired = false;
+      localStorage.removeItem("jwt_token");
+      this.$router.push("/giris-yap");
+    },
     async sendDataToBackend(results) {
       let examId = this.$route.params.id;
 
@@ -70,6 +86,11 @@ export default {
             body: JSON.stringify(results),
           });
           const result = await response.json();
+
+          if (response.status === 401 && result.msg === "Token has expired") {
+            this.showSessionExpired = true;
+            return;
+          }
           if (response.ok) {
             examId = result.examId;
             this.$router.replace(`/deneme-gir/deneme${examId}`);
@@ -90,6 +111,11 @@ export default {
           });
 
           const result = await response.json();
+
+          if (response.status === 401 && result.msg === "Token has expired") {
+            this.showSessionExpired = true;
+            return;
+          }
           if (response.ok) {
             this.responseMessage = "Veriler başarıyla güncellendi!";
             this.responseClass = "alert-success";

@@ -19,11 +19,15 @@
             <i class="bi bi-bar-chart-line-fill fs-4"></i>
           </router-link>
           <button @click="showLogoutModal = true" class="btn nav-link p-0">
-            <i class="bi bi-box-arrow-right fs-4"></i>
+            <i
+              class="bi bi-arrow-right-circle-fill fs-4 text-danger rounded-pill"
+            ></i>
           </button>
         </template>
         <template v-else>
-          <router-link to="/giris-yap" class="nav-link me-3">Giriş Yap</router-link>
+          <router-link to="/giris-yap" class="nav-link me-3"
+            >Giriş Yap</router-link
+          >
           <router-link to="/kayit-ol" class="nav-link">Kayıt Ol</router-link>
         </template>
       </div>
@@ -38,34 +42,42 @@
 </template>
 
 <script>
-import LogoutWarning from '../warnings/LogoutWarning.vue';
+import LogoutWarning from "../warnings/LogoutWarning.vue";
 
 export default {
-  name: 'NavigationBar',
+  name: "NavigationBar",
   components: { LogoutWarning },
   props: {
-    title: { type: String, default: '' }
+    title: { type: String, default: "" },
   },
   data() {
-    return { showLogoutModal: false }
+    return { 
+      showLogoutModal: false,
+     };
   },
   computed: {
     isAuth() {
-      return !!localStorage.getItem('jwt_token');
-    }
+      return !!localStorage.getItem("jwt_token");
+    },
   },
   methods: {
     confirmLogout() {
-      localStorage.removeItem('jwt_token');
+      localStorage.removeItem("jwt_token");
       this.showLogoutModal = false;
-      this.$router.push('/giris-yap');
-    }
+      this.$router.push("/giris-yap");
+    },
   }
-}
+};
 </script>
 
 <style scoped>
-.navbar { height: 60px; }
-.nav-link { color: white; }
-.nav-link:hover { color: #e0e0e0; }
+.navbar {
+  height: 60px;
+}
+.nav-link {
+  color: white;
+}
+.nav-link:hover {
+  color: #e0e0e0;
+}
 </style>
