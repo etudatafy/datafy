@@ -6,6 +6,7 @@ import ChatPage from './pages/ChatPage.vue';
 import ExamEntry from './pages/ExamEntry.vue';
 import CalenderPage from './pages/CalenderPage.vue';
 import ProgressPage from './pages/ProgressPage.vue';
+import NotFoundPage from './pages/NotFoundPage.vue';
 
 const routes = [
   { path: '/ana-sayfa', component: HomePage },
@@ -14,13 +15,30 @@ const routes = [
   { path: '/yapay-zeka-yardim/:chatId?', component: ChatPage, props: true },
   { path: '/deneme-gir/:id', component: ExamEntry, props: true },
   { path: '/takvim', component: CalenderPage },
-  { path: '/gelisim-analiz', component: ProgressPage }
-
+  { path: '/gelisim-analiz', component: ProgressPage },
+  { path: '/sayfa-bulunamadi', component: NotFoundPage },
+  { path: '/:pathMatch(.*)*', redirect: '/sayfa-bulunamadi' },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('jwt_token');
+  const isAuth = !!token;
+  const publicPages = ['/giris-yap', '/kayit-ol', '/sayfa-bulunamadi'];
+
+  if (!isAuth && !publicPages.includes(to.path)) {
+    return next('/giris-yap');
+  }
+
+  if (isAuth && ['/giris-yap', '/kayit-ol'].includes(to.path)) {
+    return next('/ana-sayfa');
+  }
+
+  next();
 });
 
 export default router;
