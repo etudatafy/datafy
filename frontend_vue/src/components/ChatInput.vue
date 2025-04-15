@@ -1,5 +1,5 @@
 <template>
-  <div class="input-group p-3 w-75 mx-auto chat-input">
+  <div class="input-group p-3 w-50 mx-auto chat-input">
     <input 
       type="text" 
       class="form-control border-success" 
