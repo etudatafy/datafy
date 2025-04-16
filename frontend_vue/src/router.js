@@ -7,6 +7,7 @@ import ExamEntry from './pages/ExamEntry.vue';
 import CalenderPage from './pages/CalenderPage.vue';
 import ProgressPage from './pages/ProgressPage.vue';
 import NotFoundPage from './pages/NotFoundPage.vue';
+import FaqPage from './pages/FaqPage.vue';
 
 const routes = [
   { path: '/ana-sayfa', component: HomePage },
@@ -17,6 +18,7 @@ const routes = [
   { path: '/takvim', component: CalenderPage },
   { path: '/gelisim-analiz', component: ProgressPage },
   { path: '/sayfa-bulunamadi', component: NotFoundPage },
+  { path: '/sikca-sorulan-sorular', component: FaqPage },
   { path: '/:pathMatch(.*)*', redirect: '/sayfa-bulunamadi' },
 ];
 

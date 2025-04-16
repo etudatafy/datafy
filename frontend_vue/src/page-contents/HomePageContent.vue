@@ -26,8 +26,8 @@
         </router-link>
       </div>
       <div class="col-6">
-        <router-link to="/canli-destek" class="btn btn-danger w-100 py-3 d-flex align-items-center justify-content-center">
-          <i class="bi bi-headset fs-4 me-2"></i> <span>Canlı Destek</span>
+        <router-link to="/sikca-sorulan-sorular" class="btn btn-danger w-100 py-3 d-flex align-items-center justify-content-center">
+          <i class="bi bi-patch-question-fill fs-4 me-2"></i> <span>Sıkça Sorulan Sorular</span>
         </router-link>
       </div>
       <div class="col-6">
