@@ -2,16 +2,6 @@ flask
 flask-cors
 flask-restful
 transformers
-accelerate
-bitsandbytes
-huggingface-hub
-torch 
-transformers 
-langchain 
-chromadb
-pypdf2 
-sentence-transformers
-tf-keras
 pyjwt
 flask_jwt_extended
 flask-pymongo
