@@ -2,12 +2,7 @@
 
 import { createStore } from 'vuex';
 
-const backendUrl =
-  typeof process !== 'undefined' &&
-  process.env &&
-  process.env.BACKEND_URL
-    ? process.env.BACKEND_URL
-    : 'http://localhost:3000';
+const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 const store = createStore({
   state() {
