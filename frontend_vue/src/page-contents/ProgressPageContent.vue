@@ -152,7 +152,7 @@ export default {
       this.loading = true;
       try {
         const res = await fetch(
-          "http://localhost:3000/api/progress/exam-details",
+          `${this.$store.getters.apiBase}/api/progress/exam-details`,
           {
             headers: { Authorization: `Bearer ${this.token}` },
           }

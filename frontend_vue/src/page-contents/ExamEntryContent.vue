@@ -43,7 +43,7 @@ export default {
     const examId = this.$route.params.id;
     if (examId !== "new") {
       try {
-        const response = await fetch("http://localhost:3000/api/exam/exam-details", {
+        const response = await fetch(`${this.$store.getters.apiBase}/api/exam/exam-details`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.token}` },
           body: JSON.stringify({ exam_id: examId }),
@@ -80,7 +80,7 @@ export default {
 
       if (examId === "new") {
         try {
-          const response = await fetch("http://localhost:3000/api/exam/add", {
+          const response = await fetch(`${this.$store.getters.apiBase}/api/exam/add`, {
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.token}` },
             body: JSON.stringify(results),
@@ -104,7 +104,7 @@ export default {
         }
       } else {
         try {
-          const response = await fetch("http://localhost:3000/api/exam/edit-exam", {
+          const response = await fetch(`${this.$store.getters.apiBase}/api/exam/edit-exam`, {
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.token}` },
             body: JSON.stringify({ exam_id: examId, ...results }),

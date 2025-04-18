@@ -60,7 +60,7 @@ export default {
       if (!this.token) return;
 
       try {
-        const response = await fetch("http://localhost:3000/api/chat/chat-history", {
+        const response = await fetch(`${this.$store.getters.apiBase}/api/chat/chat-history`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${this.token}` },
           body: JSON.stringify({ chatId: this.chatId }),
@@ -101,7 +101,7 @@ export default {
       if (this.chatId) payload.chatId = this.chatId;
 
       try {
-        const response = await fetch("http://localhost:3000/api/chat/update-chat", {
+        const response = await fetch(`${this.$store.getters.apiBase}/api/chat/update-chat`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${this.token}` },
           body: JSON.stringify(payload),
