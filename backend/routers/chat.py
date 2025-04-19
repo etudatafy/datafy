@@ -5,9 +5,23 @@ from bson.objectid import ObjectId
 import datetime
 import requests
 import config
+import os
+from dotenv import load_dotenv
+from pathlib import Path
 
 chat_bp = Blueprint('chat', __name__)
 users_collection = db["users"]
+
+env = os.getenv("FLASK_ENV", "production")
+
+if env == "development":
+    base_dir = Path(__file__).resolve().parent
+    load_dotenv(dotenv_path=base_dir / ".env.development", override=True)
+
+chat_root_url = os.getenv("CHAT_ROOT", "").split(",")
+chat_root_url = chat_root_url[0]
+
+print(f"[{env}] Using CHAT URL: {chat_root_url}")
 
 def is_token_valid(user):
     if "token_expiry" not in user or datetime.datetime.utcnow() > user["token_expiry"]:
@@ -36,6 +50,7 @@ def add_message_to_chat(user_id, chat_id, text, sender_type):
 @chat_bp.route('/update-chat', methods=['POST'])
 @jwt_required()
 def chat():
+    global chat_root_url
     user_id = get_jwt_identity()
     data = request.json
     chat_type = data.get("type")
@@ -62,7 +77,7 @@ def chat():
             # FastAPI backend'e istek gönder
             payload = {"query": user_message, "user_id": str(user_id)}
             try:
-                resp = requests.post("http://localhost:8000/query", json=payload)
+                resp = requests.post(chat_root_url + "/query", json=payload)
                 resp.raise_for_status()
                 model_response = resp.json().get("response", "")
             except Exception as e:
@@ -104,7 +119,7 @@ def chat():
         else:
             payload = {"query": user_message, "user_id": str(user_id)}
             try:
-                resp = requests.post("http://localhost:8000/query", json=payload)
+                resp = requests.post(chat_root_url + "/query", json=payload)
                 resp.raise_for_status()
                 model_response = resp.json().get("response", "")
             except Exception as e:
