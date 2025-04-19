@@ -9,3 +9,4 @@ dnspython
 bcrypt
 gunicorn
 python-dotenv
+requests

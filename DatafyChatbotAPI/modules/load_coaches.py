@@ -50,7 +50,7 @@ def create_coach_collection():
         FieldSchema(name="isim_soyisim", dtype=DataType.VARCHAR, max_length=100),
         FieldSchema(name="okul", dtype=DataType.VARCHAR, max_length=100),
         FieldSchema(name="bolum", dtype=DataType.VARCHAR, max_length=100),
-        FieldSchema(name="biyografi", dtype=DataType.VARCHAR, max_length=2000),
+        FieldSchema(name="biyografi", dtype=DataType.VARCHAR, max_length=5000),
         FieldSchema(name="kocluk_ucreti", dtype=DataType.INT64),  # Filtreleme kriterleri
         FieldSchema(name="tecrube_sene", dtype=DataType.INT64),   # Filtreleme kriterleri
         FieldSchema(name="mezuna_kaldi", dtype=DataType.BOOL),    # Filtreleme kriterleri
