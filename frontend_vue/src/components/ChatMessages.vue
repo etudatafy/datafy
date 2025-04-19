@@ -1,7 +1,7 @@
 <template>
   <div ref="messagesContainer" class="d-flex flex-column gap-2 chat-messages">
-    <div 
-      v-for="(msg, index) in messages" 
+    <div
+      v-for="(msg, index) in messages"
       :key="index"
       class="d-flex align-items-start gap-1"
       :class="msg.sender === 'sender' ? 'justify-content-end' : 'justify-content-start'"
@@ -9,12 +9,11 @@
       <div v-if="msg.sender !== 'sender'" class="me-2">
         <img :src="file_path" alt="User" class="chat-avatar rounded-circle">
       </div>
-      <div 
+      <div
         class="p-3 shadow-sm position-relative rounded-3"
         :class="msg.sender === 'sender' ? 'bg-light border border-success sender-message' : 'bg-success text-white receiver-message'"
-      >
-        {{ msg.text }}
-      </div>
+        v-html="renderMarkdown(msg.text)"
+      ></div>
     </div>
 
     <div v-if="loading" class="align-self-start text-muted loading-message animate-blink">
@@ -25,6 +24,7 @@
 
 <script>
 import userAvatar from "../assets/yz-logo.png";
+import MarkdownIt from "markdown-it";
 
 export default {
   props: {
@@ -33,20 +33,24 @@ export default {
   },
   data() {
     return {
-      file_path: userAvatar, 
+      file_path: userAvatar,
+      md: new MarkdownIt(),
     };
   },
   watch: {
     messages() {
       this.scrollToBottom();
     },
-    loading(newValue) {
-      if (newValue) {
+    loading(newVal) {
+      if (newVal) {
         this.scrollToBottom();
       }
-    }
+    },
   },
   methods: {
+    renderMarkdown(text) {
+      return this.md.render(text);
+    },
     scrollToBottom() {
       this.$nextTick(() => {
         const container = this.$refs.messagesContainer;
@@ -54,11 +58,11 @@ export default {
           container.scrollTop = container.scrollHeight;
         }
       });
-    }
+    },
   },
   mounted() {
     this.scrollToBottom();
-  }
+  },
 };
 </script>
 
