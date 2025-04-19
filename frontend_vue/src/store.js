@@ -1,9 +1,14 @@
+// frontend/src/store.js
+
 import { createStore } from 'vuex';
+
+const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 const store = createStore({
   state() {
     return {
       user: null,
+      apiBase: backendUrl,   // <<< burada environment ya da fallback URL
     };
   },
   mutations: {
@@ -22,6 +27,9 @@ const store = createStore({
   getters: {
     isAuthenticated(state) {
       return !!state.user;
+    },
+    apiBase(state) {
+      return state.apiBase;
     },
   },
 });

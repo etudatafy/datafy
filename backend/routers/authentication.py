@@ -69,21 +69,21 @@ def login():
     user = users_collection.find_one({"email": email})
     if not user:
         return jsonify({'message': 'Geçersiz e-posta veya şifre!'}), 401
-
+    
     stored_salt = user["salt"].encode('utf-8')
     stored_hashed_password = user["password"].encode('utf-8')
-
+    
     hashed_input_password = bcrypt.hashpw(password.encode('utf-8'), stored_salt)
-
+    
     if hashed_input_password != stored_hashed_password:
         return jsonify({'message': 'Geçersiz e-posta veya şifre!'}), 401
-
+    
     user_id = str(user["_id"])
     
     if "token_expiry" in user and datetime.datetime.utcnow() < user["token_expiry"]:
         token = jwt.encode(
             {
-                "sub": user_id,  # Burada "sub" claim'ini ekledik
+                "sub": user_id,
                 "exp": user["token_expiry"]
             },
             config.JWT_SECRET_KEY,
@@ -92,5 +92,5 @@ def login():
     else:
         token, exp_time = generate_token(user_id)
         users_collection.update_one({"_id": ObjectId(user_id)}, {"$set": {"token_expiry": exp_time}})
-
+    
     return jsonify({'token': token}), 200

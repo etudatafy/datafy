@@ -172,7 +172,7 @@ export default {
 
       try {
         const response = await fetch(
-          "http://localhost:3000/api/exam/edit-exam",
+          `${this.$store.getters.apiBase}/api/exam/edit-exam`,
           {
             method: "POST",
             headers: {
@@ -205,7 +205,7 @@ export default {
 
       try {
         const response = await fetch(
-          "http://localhost:3000/api/exam/delete-exam",
+          `${this.$store.getters.apiBase}/api/exam/delete-exam`,
           {
             method: "POST",
             headers: {

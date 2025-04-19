@@ -48,7 +48,7 @@ export default {
     async login() {
       this.loading = true;
       try {
-        const response = await axios.post('http://localhost:3000/api/auth/login', {
+        const response = await axios.post(`${this.$store.getters.apiBase}/api/auth/login`, {
           email: this.form.email,
           password: this.form.password,
         });

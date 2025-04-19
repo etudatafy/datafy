@@ -175,7 +175,7 @@ export default {
     },
     async fetchExams() {
       try {
-        const res = await fetch("http://localhost:3000/api/exam/fetch-exams", {
+        const res = await fetch(`${this.$store.getters.apiBase}/api/exam/fetch-exams`, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
         const data = await res.json();
@@ -193,7 +193,7 @@ export default {
         return alert("Tüm alanları doldurun!");
       }
       try {
-        const res = await fetch("http://localhost:3000/api/exam/add", {
+        const res = await fetch(`${this.$store.getters.apiBase}/api/exam/add`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -219,7 +219,7 @@ export default {
     async deleteExam(id) {
       if (!confirm("Silmek istediğinize emin misiniz?")) return;
       try {
-        const res = await fetch("http://localhost:3000/api/exam/delete-exam", {
+        const res = await fetch(`${this.$store.getters.apiBase}/api/exam/delete-exam`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
