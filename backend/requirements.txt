@@ -8,9 +8,5 @@ flask-pymongo
 dnspython
 bcrypt
 gunicorn
-<<<<<<< HEAD
 python-dotenv
 requests
-=======
-python-dotenv
->>>>>>> main
