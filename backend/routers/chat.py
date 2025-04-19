@@ -8,6 +8,7 @@ import config
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+import json
 
 chat_bp = Blueprint('chat', __name__)
 users_collection = db["users"]
@@ -75,7 +76,15 @@ def chat():
             model_response = "Hello World"
         else:
             # FastAPI backend'e istek gönder
-            payload = {"query": user_message, "user_id": str(user_id)}
+            exams = user.get("exams", [])
+            full_query = (
+                "Sınav bilgileri:\n" +
+                json.dumps(exams, ensure_ascii=False, indent=2) +
+                "\n\nKullanıcı mesajı:\n" +
+                user_message
+            )
+            full_query = f"Sınavlar:\n{full_query}\n\nKullanıcı: {user_message}"
+            payload = {"query": full_query, "user_id": str(user_id)}
             try:
                 resp = requests.post(chat_root_url + "/query", json=payload)
                 resp.raise_for_status()
@@ -117,7 +126,15 @@ def chat():
         if getattr(config, 'chat_test_mode', False):
             model_response = "Hello World"
         else:
-            payload = {"query": user_message, "user_id": str(user_id)}
+            exams = user.get("exams", [])
+            full_query = (
+                "Sınav bilgileri:\n" +
+                json.dumps(exams, ensure_ascii=False, indent=2) +
+                "\n\nKullanıcı mesajı:\n" +
+                user_message
+            )
+            full_query = f"Sınavlar:\n{full_query}\n\nKullanıcı: {user_message}"
+            payload = {"query": full_query, "user_id": str(user_id)}
             try:
                 resp = requests.post(chat_root_url + "/query", json=payload)
                 resp.raise_for_status()
