@@ -3,11 +3,10 @@ from database import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from bson.objectid import ObjectId
 import datetime
-import config  # Config dosyasını içe aktarıyoruz
-#from model import rag_model  # RAGModel sınıfını içe aktarıyoruz
+import requests
+import config
 
 chat_bp = Blueprint('chat', __name__)
-
 users_collection = db["users"]
 
 def is_token_valid(user):
@@ -57,8 +56,17 @@ def chat():
         user["ai-chat-histories"] = []
 
     if chat_type == 1:
-        # LLM'den yanıt al
-        model_response = "Hello World" #rag_model.generate_response(user_message)
+        if config.chat_test_mode == True:
+            model_response = "Hello World"
+        else:
+            # FastAPI backend'e istek gönder
+            payload = {"query": user_message, "user_id": str(user_id)}
+            try:
+                resp = requests.post("http://localhost:8000/query", json=payload)
+                resp.raise_for_status()
+                model_response = resp.json().get("response", "")
+            except Exception as e:
+                model_response = f"Hata: {e}"
 
         new_chat = {
             "_id": ObjectId(),
@@ -91,8 +99,16 @@ def chat():
         if messages is None:
             return jsonify({"error": "Sohbet bulunamadı"}), 404
 
-        # LLM'den yanıt al
-        model_response = "Hello World" #rag_model.generate_response(user_message)
+        if getattr(config, 'chat_test_mode', False):
+            model_response = "Hello World"
+        else:
+            payload = {"query": user_message, "user_id": str(user_id)}
+            try:
+                resp = requests.post("http://localhost:8000/query", json=payload)
+                resp.raise_for_status()
+                model_response = resp.json().get("response", "")
+            except Exception as e:
+                model_response = f"Hata: {e}"
 
         messages = add_message_to_chat(user_id, chat_id, model_response, "receiver")
 
